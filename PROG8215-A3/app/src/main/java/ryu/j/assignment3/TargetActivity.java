@@ -11,7 +11,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class ResultActivity extends FragmentActivity implements OnMapReadyCallback {
+public class TargetActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private static int ZOOM_LEVEL = 17;
@@ -20,7 +20,7 @@ public class ResultActivity extends FragmentActivity implements OnMapReadyCallba
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_result);
+        setContentView(R.layout.activity_target);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

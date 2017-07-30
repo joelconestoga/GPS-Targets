@@ -31,7 +31,7 @@
                 android:value="AIzaSyCqhkFcd7Uqjdc1R5giuPu90qnU2ExR1EI"/>
 
         <activity
-                android:name=".MapsActivity"
+                android:name=".MainActivity"
                 android:label="@string/title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -40,7 +40,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".ResultActivity"
+                android:name=".TargetActivity"
                 android:label="@string/title_activity_result">
         </activity>
     </application>

@@ -5,7 +5,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/halfSpace"
-        tools:context="ryu.j.assignment3.ResultActivity">
+        tools:context="ryu.j.assignment3.TargetActivity">
     <TextView
             android:id="@+id/resultTitle"
             android:text="@string/resultTitle"

@@ -27,13 +27,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements LocationListener,
+public class MainActivity extends FragmentActivity implements LocationListener,
         OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
     // Request code for location permission request.
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 7389;
-    // Request code for ResultActivity intent
+    // Request code for TargetActivity intent
     private final static int RESULT_ON_MAP = 9893;
 
     // Initial location: Kitchener, ON
@@ -66,7 +66,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_main);
 
         setupMap();
 
@@ -94,35 +94,39 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         // Distance variables
         int minDist = 0;
-        int maxDist = 100;
+        int maxDist = 1000;
 
         // Set distance string as minDist
         txvRange = (TextView) findViewById(R.id.distanceIndicator);
         txvRange.setText(getLabelFor(minDist));
 
         // Set max value
-        SeekBar rangeBar = (SeekBar) findViewById(R.id.setDistance);
-        rangeBar.setMax(maxDist);
+        SeekBar seekBar = (SeekBar) findViewById(R.id.setDistance);
+        seekBar.setMax(maxDist);
 
         // When the SeekBar is slided,
-        rangeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                txvRange.setText(getLabelFor(range));
-
                 range = progress;
+                updateSeekLabel();
+                updateMarker();
+            }
 
+            private void updateSeekLabel() {
+                txvRange.setText(getLabelFor(range));
+            }
+
+            private void updateMarker() {
                 target = createTargetFor(range);
-                setUserMarker(target);
+                googleMap.clear();
+                googleMap.addMarker(new MarkerOptions().position(target).title("Target Location"));
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
+            public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
     }
 
@@ -218,14 +222,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         return new LatLng(cartesian[0], cartesian[1]);
     }
 
-    // Set marker from user distance
-    private void setUserMarker(LatLng target) {
-        // Remove all markers
-        googleMap.clear();
-        // Add new marker
-        googleMap.addMarker(new MarkerOptions().position(target).title("Target Location"));
-    }
-
     @Override
     public void onConnectionSuspended(int i) {
         googleApiClient.connect();
@@ -241,7 +237,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         double[] location = {target.latitude, target.longitude};
 
         // Create intent for finger drawing
-        Intent resultIntent = new Intent(MapsActivity.this, ResultActivity.class);
+        Intent resultIntent = new Intent(MainActivity.this, TargetActivity.class);
         // Passing the coordinate
         resultIntent.putExtra("location", location);
         // Start the Activity
