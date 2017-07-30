@@ -1,11 +1,13 @@
 package ryu.j.assignment3;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -41,7 +43,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private static double METRE2DEG = 0.00001;
 
     // Google maps variables
-    private GoogleMap mMap;
+    private GoogleMap googleMap;
     private GoogleApiClient googleApiClient;
 
     // Coordinate variables
@@ -53,6 +55,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private int range;
     private LatLng target;
     private TextView txvRange;
+
+    @Override
+    protected void attachBaseContext(Context context) {
+        super.attachBaseContext(context);
+        MultiDex.install(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,7 +145,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         // Instantiate map object
-        mMap = googleMap;
+        this.googleMap = googleMap;
 
         // Check permission for setMyLocationEnabled
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -148,20 +156,20 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         }
 
         // Using MyLocation feature
-        mMap.setMyLocationEnabled(true);
+        this.googleMap.setMyLocationEnabled(true);
         // Show huge scale map centred on INIT_LOCATION
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(INIT_LOCATION, 2));
+        this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(INIT_LOCATION, 2));
     }
 
     @Override
     public void onLocationChanged(Location location) {
         // Clear markers
-        mMap.clear();
+        googleMap.clear();
         // Get current coordinate
         updateCoordinates(location);
 
         // Move camera to here
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(lastLatitude, lastLongitude), ZOOM_LEVEL));
     }
 
@@ -213,9 +221,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     // Set marker from user distance
     private void setUserMarker(LatLng target) {
         // Remove all markers
-        mMap.clear();
+        googleMap.clear();
         // Add new marker
-        mMap.addMarker(new MarkerOptions().position(target).title("Target Location"));
+        googleMap.addMarker(new MarkerOptions().position(target).title("Target Location"));
     }
 
     @Override
