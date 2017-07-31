@@ -7,7 +7,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringDef;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -25,7 +24,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -38,12 +36,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
     // Request code for TargetActivity intent
     private final static int RESULT_ON_MAP = 9893;
 
-    // Initial location: Kitchener, ON
-    private static LatLng INIT_LOCATION = new LatLng(43.449629, -80.484555);
-    //private static LatLng INIT_LOCATION = new LatLng(43.3898641, -80.40478200000001);
-    private static int ZOOM_LEVEL = 17;
-    private static double METRE2DEG = 0.00001;
-
     // Google maps variables
     private GoogleMap googleMap;
     private GoogleApiClient googleApiClient;
@@ -51,16 +43,12 @@ public class MainActivity extends FragmentActivity implements LocationListener,
     // Coordinate variables
     private double lastLatitude;
     private double lastLongitude;
-    private double lastBearing;
     private float degrees;
 
     // Variables for user custom position
     private int range;
     private LatLng target;
     private TextView txvRange;
-
-    private CompassSensor compass;
-    TextView title;
 
     @Override
     protected void attachBaseContext(Context context) {
@@ -76,11 +64,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
         setupMap();
         setupSeekBar();
-
-        title = (TextView) findViewById(R.id.title);
-
-        //compass = new CompassSensor(this, title);
-
     }
 
     @Override
@@ -115,7 +98,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
         // Distance variables
         int minDist = 0;
-        int maxDist = 1000;
+        int maxDist = 5000;
 
         // Set distance string as minDist
         txvRange = (TextView) findViewById(R.id.distanceIndicator);
@@ -170,33 +153,52 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
         // Using MyLocation feature
         this.googleMap.setMyLocationEnabled(true);
-        // Show huge scale map centred on INIT_LOCATION
-        this.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(INIT_LOCATION, 2));
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        CameraPosition cameraPosition = googleMap.getCameraPosition();
-        if (cameraPosition != null)
-            degrees = cameraPosition.bearing;
-        else
-            degrees = 0;
-
-        lastBearing = location.getBearing();
-        double radian = ((lastBearing + 90) % 360) * (Math.PI / 180);
-
-
-        title.setText("Radian: " + String.valueOf(lastBearing) +
-                      " / Degrees: " + String.valueOf(degrees));
-
-        // Clear markers
-        googleMap.clear();
-        // Get current coordinate
         updateCoordinates(location);
 
         // Move camera to here
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(lastLatitude, lastLongitude), ZOOM_LEVEL));
+                new LatLng(lastLatitude, lastLongitude), googleMap.getCameraPosition().zoom));
+    }
+
+    // Store coordinates from current location
+    private void updateCoordinates(Location loc) {
+        lastLatitude = loc.getLatitude();
+        lastLongitude = loc.getLongitude();
+        degrees = googleMap.getCameraPosition().bearing;
+    }
+
+    // Compute cartesian coordinate from polar coordinate
+    private LatLng createTargetFor(int range) {
+
+        float radius = 6371;
+
+        double distance = (double) range / 1000;
+
+        //New latitude in degrees
+        double new_latitude = radToDeg(Math.asin(Math.sin(degToRad(lastLatitude)) *
+                Math.cos(distance / radius) + Math.cos(degToRad(lastLatitude)) *
+                Math.sin(distance / radius) * Math.cos(degToRad(degrees))));
+
+        //	New longitude in degrees.
+        double new_longitude = radToDeg(degToRad(lastLongitude) + Math.atan2(Math.sin(degToRad(degrees)) *
+                Math.sin(distance / radius) *  Math.cos(degToRad(lastLatitude)),
+                Math.cos(distance / radius) - Math.sin(degToRad(lastLatitude)) *
+                        Math.sin(degToRad(new_latitude))));
+
+        // Return instantiated LatLng object
+        return new LatLng(new_latitude, new_longitude);
+    }
+
+    private double degToRad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private double radToDeg(double rad) {
+        return (rad * 180.0 / Math.PI);
     }
 
     @Override
@@ -220,27 +222,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         if (locationAvailability.isLocationAvailable()) {
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, mLocationRequest, this);
         }
-    }
-
-    // Store coordinates from current location
-    private void updateCoordinates(Location loc) {
-        lastLatitude = loc.getLatitude();
-        lastLongitude = loc.getLongitude();
-        lastBearing = loc.getBearing();
-    }
-
-    // Compute cartesian coordinate from polar coordinate
-    private LatLng createTargetFor(int range) {
-
-        // Convert degree to radian
-        double radian = ((lastBearing + 90) % 360) * (Math.PI / 180);
-        // Latitude: Y
-        double latitude = lastLatitude + (range * Math.sin(radian) * METRE2DEG);
-        // Longitude: X
-        double longitude = lastLongitude + (range * Math.cos(radian) * METRE2DEG);
-
-        // Return instantiated LatLng object
-        return new LatLng(latitude, longitude);
     }
 
     @Override
