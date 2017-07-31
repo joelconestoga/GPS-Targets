@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ryu.j.assignment3;
+package ca.joel.mapapp;
 
 import android.Manifest;
 import android.app.AlertDialog;

@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/halfSpace"
-        tools:context="ryu.j.assignment3.MainActivity">
+        tools:context="ryu.j.assignment3.ca.joel.mapapp.MainActivity">
 
     <fragment
         android:id="@+id/googleMap"

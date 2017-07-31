@@ -1,4 +1,4 @@
-package ryu.j.assignment3;
+package ca.joel.mapapp;
 
 import android.content.Context;
 import android.hardware.Sensor;

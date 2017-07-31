@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="ryu.j.assignment3">
+          package="ca.joel.mapapp">
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -31,7 +31,7 @@
                 android:value="AIzaSyCqhkFcd7Uqjdc1R5giuPu90qnU2ExR1EI"/>
 
         <activity
-                android:name=".MainActivity"
+                android:name="ca.joel.mapapp.MainActivity"
                 android:label="@string/title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -40,7 +40,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".TargetActivity"
+                android:name="ca.joel.mapapp.TargetActivity"
                 android:label="@string/title_activity_result">
         </activity>
     </application>
