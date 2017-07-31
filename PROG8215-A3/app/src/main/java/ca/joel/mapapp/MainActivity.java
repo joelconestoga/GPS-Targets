@@ -34,21 +34,21 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 7389;
-    private final static int RESULT_ON_MAP = 9893;
+    private static final int LOCATION_PERMISSION_REQUEST = 7389;
+    private final static int TARGET_INTENT = 9893;
 
-    DatabaseReference firebaseDB;
-
-    private GoogleMap googleMap;
     private GoogleApiClient googleApiClient;
+    private GoogleMap googleMap;
 
-    private double lastLatitude;
-    private double lastLongitude;
+    private double latitude;
+    private double longitude;
     private float degrees;
 
     private int range;
     private LatLng target;
     private TextView seekLabel;
+
+    DatabaseReference firebaseDB;
 
     @Override
     protected void attachBaseContext(Context context) {
@@ -148,7 +148,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         // Check permission for setMyLocationEnabled
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST_CODE,
+            PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST,
                     android.Manifest.permission.ACCESS_FINE_LOCATION, true);
             return;
         }
@@ -163,13 +163,13 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
         // Move camera to here
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(lastLatitude, lastLongitude), googleMap.getCameraPosition().zoom));
+                new LatLng(latitude, longitude), googleMap.getCameraPosition().zoom));
     }
 
     // Store coordinates from current location
     private void updateCoordinates(Location loc) {
-        lastLatitude = loc.getLatitude();
-        lastLongitude = loc.getLongitude();
+        latitude = loc.getLatitude();
+        longitude = loc.getLongitude();
         degrees = googleMap.getCameraPosition().bearing;
     }
 
@@ -181,14 +181,14 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         double distance = (double) range / 1000;
 
         //New latitude in degrees
-        double new_latitude = radToDeg(Math.asin(Math.sin(degToRad(lastLatitude)) *
-                Math.cos(distance / radius) + Math.cos(degToRad(lastLatitude)) *
+        double new_latitude = radToDeg(Math.asin(Math.sin(degToRad(latitude)) *
+                Math.cos(distance / radius) + Math.cos(degToRad(latitude)) *
                 Math.sin(distance / radius) * Math.cos(degToRad(degrees))));
 
         //	New longitude in degrees.
-        double new_longitude = radToDeg(degToRad(lastLongitude) + Math.atan2(Math.sin(degToRad(degrees)) *
-                Math.sin(distance / radius) *  Math.cos(degToRad(lastLatitude)),
-                Math.cos(distance / radius) - Math.sin(degToRad(lastLatitude)) *
+        double new_longitude = radToDeg(degToRad(longitude) + Math.atan2(Math.sin(degToRad(degrees)) *
+                Math.sin(distance / radius) *  Math.cos(degToRad(latitude)),
+                Math.cos(distance / radius) - Math.sin(degToRad(latitude)) *
                         Math.sin(degToRad(new_latitude))));
 
         // Return instantiated LatLng object
@@ -214,7 +214,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         // Check permission
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST_CODE,
+            PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST,
                     android.Manifest.permission.ACCESS_FINE_LOCATION, true);
             return;
         }
@@ -247,7 +247,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         // Passing the coordinate
         resultIntent.putExtra("location", location);
         // Start the Activity
-        startActivityForResult(resultIntent, RESULT_ON_MAP);
+        startActivityForResult(resultIntent, TARGET_INTENT);
     }
 
     private void persistCoordinate(double latitude, double longitude) {
