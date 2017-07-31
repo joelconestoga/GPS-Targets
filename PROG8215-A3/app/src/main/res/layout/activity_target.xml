@@ -1,39 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/halfSpace"
         tools:context="ryu.j.assignment3.TargetActivity">
-    <TextView
-            android:id="@+id/resultTitle"
-            android:text="@string/resultTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/fullSpace"
-            android:background="@color/primary_dark"
-            android:textColor="@color/icons"
-            android:textSize="@dimen/title"
-            android:textStyle="bold"
-            android:textAlignment="center"/>
+
     <fragment
             android:id="@+id/resultMap"
-            android:layout_below="@+id/resultTitle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:name="com.google.android.gms.maps.SupportMapFragment"/>
-    <Button
-            android:id="@+id/back2Main"
-            android:text="@string/back2Main"
-            android:onClick="back2Main"
-            android:background="@color/accent"
-            android:textColor="@color/icons"
-            android:textSize="@dimen/icon_large"
-            android:textStyle="bold"
-            android:padding="@dimen/fullSpace"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"/>
+            android:layout_height="match_parent"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:clickable="true"
+        android:onClick="backToMain"
+        app:srcCompat="@android:drawable/ic_menu_revert" />
+
+
 </RelativeLayout>

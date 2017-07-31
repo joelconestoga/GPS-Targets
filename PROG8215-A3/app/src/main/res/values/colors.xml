@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Ryu custom-->
-    <color name="primary">#9EAFC1</color>
+    <color name="primary">#8b8c8c</color>
     <color name="primary_dark">#4B5578</color>
     <color name="primary_light">#D9E2F1</color>
-    <color name="accent">#012C57</color>
+    <color name="accent">#474c51</color>
     <color name="primary_text">#333333</color>
     <color name="secondary_text">#727272</color>
     <color name="icons">#F1F6F2</color>

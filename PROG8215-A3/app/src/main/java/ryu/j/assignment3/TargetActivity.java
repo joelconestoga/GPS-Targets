@@ -13,7 +13,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class TargetActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
     private static int ZOOM_LEVEL = 17;
 
     @Override
@@ -31,20 +30,18 @@ public class TargetActivity extends FragmentActivity implements OnMapReadyCallba
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
 
         LatLng userLoc = getLocation();
 
-        // Add a marker from main intent and move the camera
-        mMap.addMarker(new MarkerOptions().position(userLoc)
-                .title(String.format("Lat: %f, Lng: %f", userLoc.latitude, userLoc.longitude)));
+        String label = String.format("Target: Lat(%f), Lng(%f)",
+                userLoc.latitude, userLoc.longitude);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc, ZOOM_LEVEL));
+        googleMap.addMarker(new MarkerOptions().position(userLoc).title(label));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLoc, ZOOM_LEVEL));
     }
 
     // Return to main activity
-    public void back2Main(View view) {
-        // Finish the intent
+    public void backToMain(View view) {
         finish();
     }
 

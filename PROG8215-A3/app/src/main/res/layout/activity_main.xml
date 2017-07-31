@@ -1,65 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/halfSpace"
         tools:context="ryu.j.assignment3.MainActivity">
-    <TextView
-            android:id="@+id/title"
-            android:text="@string/title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/fullSpace"
-            android:background="@color/primary_dark"
-            android:textColor="@color/icons"
-            android:textSize="@dimen/title"
-            android:textStyle="bold"
-            android:textAlignment="center"/>
+
     <fragment
-            android:id="@+id/googleMap"
-            android:layout_below="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:name="com.google.android.gms.maps.SupportMapFragment"/>
-    <LinearLayout
-            android:id="@+id/controllers"
-            android:background="@color/controllerBG"
-            android:layout_marginTop="@dimen/divSpace"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:orientation="vertical">
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-            <TextView
-                    android:id="@+id/distanceIndicator"
-                    android:text="@string/distance"
-                    android:layout_marginStart="@dimen/fullSpace"
-                    android:textColor="@color/primary_dark"
-                    android:textSize="@dimen/icon_large"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-        </LinearLayout>
-        <SeekBar
-                android:id="@+id/setDistance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        <Button
-                android:id="@+id/seeResult"
-                android:text="@string/result"
-                android:onClick="setOnMap"
-                android:background="@color/accent"
-                android:textColor="@color/icons"
-                android:textSize="@dimen/icon_large"
-                android:textStyle="bold"
-                android:padding="@dimen/fullSpace"
-                android:layout_marginTop="@dimen/halfSpace"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-    </LinearLayout>
+        android:id="@+id/googleMap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_above="@+id/seekLabel" />
+
+    <TextView
+        android:id="@+id/seekLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/distance"
+        android:textColor="@color/primary_dark"
+        android:textSize="@dimen/icon_large"
+        android:textAlignment="center"
+        android:layout_above="@+id/seekBar"
+        android:layout_toStartOf="@+id/fabTarget" />
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/fabTarget" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabTarget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:clickable="true"
+        android:onClick="showTargetOnMap"
+        app:srcCompat="@android:drawable/ic_menu_myplaces" />
+
+
+
 </RelativeLayout>

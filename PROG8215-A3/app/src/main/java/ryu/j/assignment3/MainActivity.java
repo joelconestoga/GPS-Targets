@@ -31,24 +31,19 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    // Request code for location permission request.
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 7389;
-    // Request code for TargetActivity intent
     private final static int RESULT_ON_MAP = 9893;
 
-    // Google maps variables
     private GoogleMap googleMap;
     private GoogleApiClient googleApiClient;
 
-    // Coordinate variables
     private double lastLatitude;
     private double lastLongitude;
     private float degrees;
 
-    // Variables for user custom position
     private int range;
     private LatLng target;
-    private TextView txvRange;
+    private TextView seekLabel;
 
     @Override
     protected void attachBaseContext(Context context) {
@@ -101,11 +96,11 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         int maxDist = 5000;
 
         // Set distance string as minDist
-        txvRange = (TextView) findViewById(R.id.distanceIndicator);
-        txvRange.setText(getLabelFor(minDist));
+        seekLabel = (TextView) findViewById(R.id.seekLabel);
+        seekLabel.setText(getLabelFor(minDist));
 
         // Set max value
-        SeekBar seekBar = (SeekBar) findViewById(R.id.setDistance);
+        SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
         seekBar.setMax(maxDist);
 
         // When the SeekBar is slided,
@@ -118,7 +113,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
             }
 
             private void updateSeekLabel() {
-                txvRange.setText(getLabelFor(range));
+                seekLabel.setText(getLabelFor(range));
             }
 
             private void updateMarker() {
@@ -234,7 +229,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
     }
 
     // Create Activity
-    public void setOnMap(View view) {
+    public void showTargetOnMap(View view) {
         // Location as double array
         double[] location = {target.latitude, target.longitude};
 
