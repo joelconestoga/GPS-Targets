@@ -7,6 +7,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringDef;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -50,11 +52,15 @@ public class MainActivity extends FragmentActivity implements LocationListener,
     private double lastLatitude;
     private double lastLongitude;
     private double lastBearing;
+    private float degrees;
 
     // Variables for user custom position
     private int range;
     private LatLng target;
     private TextView txvRange;
+
+    private CompassSensor compass;
+    TextView title;
 
     @Override
     protected void attachBaseContext(Context context) {
@@ -69,9 +75,24 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         setContentView(R.layout.activity_main);
 
         setupMap();
-
-        // Set distance SeekBar on
         setupSeekBar();
+
+        title = (TextView) findViewById(R.id.title);
+
+        //compass = new CompassSensor(this, title);
+
+    }
+
+    @Override
+    protected void onStart() {
+        googleApiClient.connect();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        googleApiClient.disconnect();
+        super.onStop();
     }
 
     private void setupMap() {
@@ -135,18 +156,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
     }
 
     @Override
-    protected void onStart() {
-        googleApiClient.connect();
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        googleApiClient.disconnect();
-        super.onStop();
-    }
-
-    @Override
     public void onMapReady(GoogleMap googleMap) {
         // Instantiate map object
         this.googleMap = googleMap;
@@ -167,6 +176,19 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
     @Override
     public void onLocationChanged(Location location) {
+        CameraPosition cameraPosition = googleMap.getCameraPosition();
+        if (cameraPosition != null)
+            degrees = cameraPosition.bearing;
+        else
+            degrees = 0;
+
+        lastBearing = location.getBearing();
+        double radian = ((lastBearing + 90) % 360) * (Math.PI / 180);
+
+
+        title.setText("Radian: " + String.valueOf(lastBearing) +
+                      " / Degrees: " + String.valueOf(degrees));
+
         // Clear markers
         googleMap.clear();
         // Get current coordinate
@@ -209,17 +231,16 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
     // Compute cartesian coordinate from polar coordinate
     private LatLng createTargetFor(int range) {
-        double[] cartesian = new double[2];
+
         // Convert degree to radian
         double radian = ((lastBearing + 90) % 360) * (Math.PI / 180);
-
         // Latitude: Y
-        cartesian[0] = lastLatitude + (range * Math.sin(radian) * METRE2DEG);
+        double latitude = lastLatitude + (range * Math.sin(radian) * METRE2DEG);
         // Longitude: X
-        cartesian[1] = lastLongitude + (range * Math.cos(radian) * METRE2DEG);
+        double longitude = lastLongitude + (range * Math.cos(radian) * METRE2DEG);
 
         // Return instantiated LatLng object
-        return new LatLng(cartesian[0], cartesian[1]);
+        return new LatLng(latitude, longitude);
     }
 
     @Override
