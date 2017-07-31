@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -26,6 +27,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends FragmentActivity implements LocationListener,
         OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
@@ -33,6 +36,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 7389;
     private final static int RESULT_ON_MAP = 9893;
+
+    DatabaseReference firebaseDB;
 
     private GoogleMap googleMap;
     private GoogleApiClient googleApiClient;
@@ -56,6 +61,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        firebaseDB = FirebaseDatabase.getInstance().getReference("coordinates");
 
         setupMap();
         setupSeekBar();
@@ -233,11 +240,21 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         // Location as double array
         double[] location = {target.latitude, target.longitude};
 
+        persistCoordinate(target.latitude, target.longitude);
+
         // Create intent for finger drawing
         Intent resultIntent = new Intent(MainActivity.this, TargetActivity.class);
         // Passing the coordinate
         resultIntent.putExtra("location", location);
         // Start the Activity
         startActivityForResult(resultIntent, RESULT_ON_MAP);
+    }
+
+    private void persistCoordinate(double latitude, double longitude) {
+        String id = firebaseDB.push().getKey();
+        Coordinate coordinate = new Coordinate(id, latitude, longitude);
+        firebaseDB.child(id).setValue(coordinate);
+
+        Toast.makeText(this, "Target persisted on Firebase...", Toast.LENGTH_LONG).show();
     }
 }
