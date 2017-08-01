@@ -7,6 +7,7 @@ Highlights
 * Choose the distance from your current location using seekbar
 * Spin the Map to choose the direction (North, South, ...)
 * Save the target on Firebase
+
 ![image](https://user-images.githubusercontent.com/25067011/28851068-3c77f21a-76ee-11e7-9d99-e883e38e8c7f.png)
 
 * Download and view all saved targets on Google Map
