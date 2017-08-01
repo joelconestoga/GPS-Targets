@@ -1,11 +1,10 @@
 <resources>
     <string name="app_name">Assignment3</string>
-    <string name="title">GPS Direction</string>
+    <string name="title">GPS Targets</string>
     <string name="title_activity_result">ResultOnMap</string>
     <string name="distance">Distance: %1$d m</string>
     <string name="result">See Result</string>
     <string name="resultTitle">Calculated Location</string>
-    <string name="back2Main">Return to Main</string>
     <!--    Permissions    -->
     <string name="permission_rationale_location">Access to the location service is required to demonstrate the \'my
         location\' feature, which shows your current location on the map.
