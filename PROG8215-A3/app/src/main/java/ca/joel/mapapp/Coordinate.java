@@ -1,9 +1,10 @@
 package ca.joel.mapapp;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+        import java.text.SimpleDateFormat;
+        import java.util.Calendar;
+        import java.util.Date;
 
+//Java class to encapsulate/persist a Target
 public class Coordinate {
 
     String id;

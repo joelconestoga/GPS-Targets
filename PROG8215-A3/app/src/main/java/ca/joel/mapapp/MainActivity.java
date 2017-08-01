@@ -30,12 +30,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+//Java class for the main activity logic
 public class MainActivity extends FragmentActivity implements LocationListener,
         OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private static final int LOCATION_PERMISSION_REQUEST = 7389;
-    private final static int TARGET_INTENT = 9893;
+    private static final int LOCATION_PERMISSION_REQUEST = 100;
+    private final static int TARGET_INTENT = 101;
 
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
@@ -50,38 +51,46 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
     private DatabaseReference firebaseDB;
 
+    //Code required for multidex
     @Override
     protected void attachBaseContext(Context context) {
         super.attachBaseContext(context);
         MultiDex.install(this);
     }
 
+    //App initialization, where the execution starts
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        //Code auto-generated, just kept unchanged
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Instantiate a firebase reference
         firebaseDB = FirebaseDatabase.getInstance().getReference("coordinates");
 
+        //Initializations
         setupMap();
         setupSeekBar();
     }
 
+    //Connect with Google API
     @Override
     protected void onStart() {
         googleApiClient.connect();
         super.onStart();
     }
 
+    //Disconnect from Google API
     @Override
     protected void onStop() {
         googleApiClient.disconnect();
         super.onStop();
     }
 
+    //Setup Google Maps
     private void setupMap() {
-        // Create a GoogleAPIClient instance
+        // Create Google API Client and add this activity as listener
         if (googleApiClient == null) {
             googleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -90,27 +99,28 @@ public class MainActivity extends FragmentActivity implements LocationListener,
                     .build();
         }
 
-        // Set this activity to listen to map callbacks
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.googleMap);
+        // Bind Map Fragment to maps
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().
+                findFragmentById(R.id.googleMap);
         mapFragment.getMapAsync(this);
     }
 
-    // Distance SeekBar
+    //Setup the seekbar(slider)
     public void setupSeekBar() {
 
-        // Distance variables
+        //Boundaries
         int minDist = 0;
         int maxDist = 5000;
 
-        // Set distance string as minDist
+        //Seekbar label
         seekLabel = (TextView) findViewById(R.id.seekLabel);
         seekLabel.setText(getLabelFor(minDist));
 
-        // Set max value
+        //Seekbar boundaries
         SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
         seekBar.setMax(maxDist);
 
-        // When the SeekBar is slided,
+        //When seekbar is changed, update Label and Marker on Map
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -119,16 +129,19 @@ public class MainActivity extends FragmentActivity implements LocationListener,
                 updateMarker();
             }
 
+            //Updating the seekbar label
             private void updateSeekLabel() {
                 seekLabel.setText(getLabelFor(range));
             }
 
+            //Updating the Map Marker
             private void updateMarker() {
                 target = createTargetFor(range);
                 googleMap.clear();
                 googleMap.addMarker(new MarkerOptions().position(target).title("Target Location"));
             }
 
+            //Required methods - do nothing
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
@@ -136,16 +149,18 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         });
     }
 
+    //Formatting seekbar label
     private String getLabelFor(int minDist) {
         return String.format(getResources().getString(R.string.distance), minDist);
     }
 
+    //Callback when the Map is ready (connected with Google API)
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        // Instantiate map object
+        //Keep a reference for the Google Map
         this.googleMap = googleMap;
 
-        // Check permission for setMyLocationEnabled
+        //Check permission for Device Location
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST,
@@ -153,27 +168,30 @@ public class MainActivity extends FragmentActivity implements LocationListener,
             return;
         }
 
-        // Using MyLocation feature
+        //Activate Device Location
         this.googleMap.setMyLocationEnabled(true);
     }
 
+    //Update coordinates and camera when the location is changed
     @Override
     public void onLocationChanged(Location location) {
         updateCoordinates(location);
 
-        // Move camera to here
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(latitude, longitude), googleMap.getCameraPosition().zoom));
     }
 
-    // Store coordinates from current location
+    //Keep coordinates up to date
     private void updateCoordinates(Location loc) {
+        //Get the coordinates
         latitude = loc.getLatitude();
         longitude = loc.getLongitude();
+
+        //Get the degrees in case the user rotated the Map
         degrees = googleMap.getCameraPosition().bearing;
     }
 
-    // Compute cartesian coordinate from polar coordinate
+    //Compute the location for a new range (from the seekbar)
     private LatLng createTargetFor(int range) {
 
         float radius = 6371;
@@ -185,33 +203,37 @@ public class MainActivity extends FragmentActivity implements LocationListener,
                 Math.cos(distance / radius) + Math.cos(degToRad(latitude)) *
                 Math.sin(distance / radius) * Math.cos(degToRad(degrees))));
 
-        //	New longitude in degrees.
+        //New longitude in degrees
         double new_longitude = radToDeg(degToRad(longitude) + Math.atan2(Math.sin(degToRad(degrees)) *
                 Math.sin(distance / radius) *  Math.cos(degToRad(latitude)),
                 Math.cos(distance / radius) - Math.sin(degToRad(latitude)) *
                         Math.sin(degToRad(new_latitude))));
 
-        // Return instantiated LatLng object
+        //New position for the range provided
         return new LatLng(new_latitude, new_longitude);
     }
 
+    //Conversions
     private double degToRad(double deg) {
         return (deg * Math.PI / 180.0);
     }
 
+    //Conversions
     private double radToDeg(double rad) {
         return (rad * 180.0 / Math.PI);
     }
 
+    //Request Mobile location
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        // Instantiate LocationRequest object and its set properties
-        LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(2000);
-        mLocationRequest.setFastestInterval(1000);
 
-        // Check permission
+        //Create request
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(2000);
+        locationRequest.setFastestInterval(1000);
+
+        //Check permission
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST,
@@ -219,28 +241,31 @@ public class MainActivity extends FragmentActivity implements LocationListener,
             return;
         }
 
-        // To request location updates
+        //Let the Google API knows the location
         LocationAvailability locationAvailability = LocationServices.FusedLocationApi.getLocationAvailability(googleApiClient);
         if (locationAvailability.isLocationAvailable()) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, mLocationRequest, this);
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         }
     }
 
+    //Keep connection with Google API
     @Override
     public void onConnectionSuspended(int i) {
         googleApiClient.connect();
     }
 
+    //If connection fails, do nothing
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
     }
 
+    //Show all my targets in another activity
     public void showMyTargets(View view) {
-        // Create intent for finger drawing
         Intent resultIntent = new Intent(MainActivity.this, TargetActivity.class);
         startActivityForResult(resultIntent, TARGET_INTENT);
     }
 
+    //Save the position as a Target on Firebase and display confirmation
     public void persistCoordinate(View view) {
         String id = firebaseDB.push().getKey();
         Coordinate coordinate = new Coordinate(id, target.latitude, target.longitude);

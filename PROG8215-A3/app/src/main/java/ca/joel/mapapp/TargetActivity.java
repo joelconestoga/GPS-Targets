@@ -20,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+//Java class for all targets activity
 public class TargetActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private LatLng lastTarget;
@@ -30,28 +31,32 @@ public class TargetActivity extends FragmentActivity implements OnMapReadyCallba
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_target);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        //Setup the Map Fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.resultMap);
-
         mapFragment.getMapAsync(this);
     }
 
+    //Once the Map is ok, download the Targets from Firebase
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Toast.makeText(this, "Downloading saved targets...", Toast.LENGTH_LONG).show();
         downloadTargets(googleMap);
     }
 
+    //Connect with Firebase and create a query
     private void downloadTargets(final GoogleMap googleMap) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         Query query = reference.child("coordinates").orderByChild("timestamp");
         query.addListenerForSingleValueEvent(createDBCallbackListener(googleMap));
     }
 
+    //Setup Markers on the Map once the Targets are downloaded
     @NonNull
     private ValueEventListener createDBCallbackListener(final GoogleMap googleMap) {
         return new ValueEventListener() {
+
+            //Convert JSON into Coordinate object and create a Marker
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -65,21 +70,25 @@ public class TargetActivity extends FragmentActivity implements OnMapReadyCallba
                 }
             }
 
+            //Setup the Marker label
             @NonNull
             private String getLabelFor(Coordinate coordinate) {
                 return "Target: Lat(" + coordinate.getLatitude() +
                         "), Lng(" + coordinate.getLongitude() + ")";
             }
 
+            //Keep track of the last target to show its title
             private void setLastTarget(Coordinate coordinate) {
                 lastTarget = new LatLng(coordinate.getLatitude(), coordinate.getLongitude());
             }
 
+            //Create a Marker on the Map
             private void createMapMakerWith(String label) {
                 Marker marker = googleMap.addMarker(new MarkerOptions().position(lastTarget).title(label));
                 marker.showInfoWindow();
             }
 
+            //Reposition the camera over the last Target and zoom on it with animation
             private void repositionCamera() {
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastTarget, 5));
                 googleMap.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
@@ -90,7 +99,7 @@ public class TargetActivity extends FragmentActivity implements OnMapReadyCallba
         };
     }
 
-    // Return to main activity
+    //Go back to main activity
     public void backToMain(View view) {
         finish();
     }
