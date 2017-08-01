@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/halfSpace"
-        tools:context="ryu.j.assignment3.ca.joel.mapapp.TargetActivity">
+        tools:context="ca.joel.mapapp.TargetActivity">
 
     <fragment
             android:id="@+id/resultMap"
@@ -22,8 +22,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
+        android:layout_marginBottom="45dp"
         android:clickable="true"
         android:onClick="backToMain"
+        app:backgroundTint="#23e494"
         app:srcCompat="@android:drawable/ic_menu_revert" />
 
 

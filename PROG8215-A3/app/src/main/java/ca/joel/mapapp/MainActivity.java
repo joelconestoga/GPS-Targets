@@ -48,7 +48,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
     private LatLng target;
     private TextView seekLabel;
 
-    DatabaseReference firebaseDB;
+    private DatabaseReference firebaseDB;
 
     @Override
     protected void attachBaseContext(Context context) {
@@ -235,24 +235,15 @@ public class MainActivity extends FragmentActivity implements LocationListener,
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
     }
 
-    // Create Activity
-    public void showTargetOnMap(View view) {
-        // Location as double array
-        double[] location = {target.latitude, target.longitude};
-
-        persistCoordinate(target.latitude, target.longitude);
-
+    public void showMyTargets(View view) {
         // Create intent for finger drawing
         Intent resultIntent = new Intent(MainActivity.this, TargetActivity.class);
-        // Passing the coordinate
-        resultIntent.putExtra("location", location);
-        // Start the Activity
         startActivityForResult(resultIntent, TARGET_INTENT);
     }
 
-    private void persistCoordinate(double latitude, double longitude) {
+    public void persistCoordinate(View view) {
         String id = firebaseDB.push().getKey();
-        Coordinate coordinate = new Coordinate(id, latitude, longitude);
+        Coordinate coordinate = new Coordinate(id, target.latitude, target.longitude);
         firebaseDB.child(id).setValue(coordinate);
 
         Toast.makeText(this, "Target persisted on Firebase...", Toast.LENGTH_LONG).show();
